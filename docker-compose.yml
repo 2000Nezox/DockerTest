@@ -1,0 +1,36 @@
+version: "3"
+services:
+  pythonapp:
+    build: ./python
+    volumes:
+      - ./python:/var/www
+    links:
+      - mysql
+    ports:
+      - "3031:3031"
+      - "8000:8000"
+    environment:
+      TZ: "Asia/Tokyo"
+
+  mysql:
+    build: ./mysql
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+      - ./mysql/sql:/docker-entrypoint-initdb.d
+      - ./mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    ports:
+      - "3306:3306"
+    environment:
+      TZ: "Asia/Tokyo"
+      MYSQL_ROOT_PASSWORD: "{root-password}"
+
+  nginx:
+    build: ./nginx
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    links:
+      - pythonapp
+    ports:
+      - "4231:80"
+    environment:
+      TZ: "Asia/Tokyo"
